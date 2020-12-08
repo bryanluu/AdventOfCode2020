@@ -13,11 +13,18 @@ else
 
 today=`date +%d`
 days=`ls -d Day* | wc -l`
-
-if [ $(($days > $today)) == 1 ]
+# remove any leading zeroes
+days=${days#0}
+today=${today#0}
+hour=$(date +%H)
+if [ $(($days > $today)) == 1 ] || ([ $today == $days ] && [ $(($hour < 21)) == 1 ])
 then
 echo "Too early! Wait until December $(($days)), 9pm PST for the next challenge."
+elif [ $today -ge 25 ]
+then
+echo "Advent already finished! (Good job)"
 else
+
 
 day=$(($days+1))
 echo "Starting Day $day..."
