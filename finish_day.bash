@@ -41,5 +41,11 @@ mv $0 ..
 
 git add $dir $timefile
 git commit -m "Added solution for December $day and updated times.csv"
+git commit --amend
+
+# if aborted, undo commit but keep files
+if [ $? == 1 ]; then
+git reset HEAD~
+fi
 
 fi
