@@ -1,4 +1,4 @@
-filename = "input"; # Input file
+filename = (isempty(ARGS) ? "input" : ARGS[1]); # Input file
 
 # Solves the challenge with input filename
 function solve(filename)

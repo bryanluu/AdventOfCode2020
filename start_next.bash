@@ -46,7 +46,7 @@ date > start
 echo "Run './finish_day.bash' to complete solution."
 
 echo '#!/bin/bash' > run
-echo "$prog $newfile" >> run
+echo "$prog $newfile" '$1' >> run
 chmod +x run
 
 code $newfile # start editing

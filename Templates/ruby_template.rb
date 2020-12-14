@@ -1,9 +1,9 @@
 #!/usr/bin/ruby
 # frozen_string_literal: true
 
-filename = 'input'
+filename = (ARGV.empty? ? 'input' : ARGV.first)
 
-def solve(filename) 
+def solve(filename)
   # SOLVE
 end
 
