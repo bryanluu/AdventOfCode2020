@@ -45,8 +45,8 @@ date > start
 
 echo "Run './finish_day.bash' to complete solution."
 
-echo '#!/bin/bash' > run
-echo "$prog $newfile" '$1' >> run
+echo '#!/bin/bash' > run.bash
+echo "$prog $newfile" '$1' >> run.bash
 chmod +x run
 
 code $newfile # start editing
@@ -60,6 +60,7 @@ else
 unfinished=`dirname */$finish`
 day=${unfinished//[!0-9]/}
 echo "Cannot start until Day $day is completed!"
+echo "Run ./run.bash to test program..."
 echo "Run './finish_day.bash' in '$unfinished/' to finish first..."
 
 fi
