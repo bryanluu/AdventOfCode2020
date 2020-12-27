@@ -34,6 +34,10 @@ do
   fi
 done
 
+read -p $"Complete Day $day, Part$partstr $parts?"$'\n' reply
+[[ $reply =~ ^[Yy].*$ ]] || skip=true # skip if reply is No
+[ $skip == true ] && echo "Stopping..." && exit 1
+
 st=$(head start)
 echo "$day,$parts,$st,$end" >> $timefile
 
