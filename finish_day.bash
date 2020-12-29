@@ -22,9 +22,10 @@ fi
 # get number of parts already saved for this day
 entries=$(egrep -c -e "^$day,1,.*$" $timefile)
 
-# check if all option is provided
 parts="$(($entries+1))"
 partstr=""
+# check if all option is provided
+if [ $parts != 2 ]; then
 for arg in $@
 do
   if [ $arg == "-a" ] || [ $arg == "--all" ]
@@ -33,10 +34,11 @@ do
     partstr="s"
   fi
 done
+fi
 
 read -p $"Complete Day $day, Part$partstr $parts?"$'\n' reply
 [[ $reply =~ ^[Yy].*$ ]] || skip=true # skip if reply is No
-[ $skip == true ] && echo "Stopping..." && exit 1
+[ -n "$skip" ] && [ $skip == true ] && echo "Stopping..." && exit 1
 
 st=$(head start)
 echo "$day,$parts,$st,$end" >> $timefile
