@@ -15,7 +15,7 @@ timefile="../times.csv"
 if [ ! -f $timefile ]
 then
 
-echo "Day,Part(s),Start,End" > $timefile
+echo "Day,Part(s),Start,End,Notes" > $timefile
 
 fi
 
@@ -41,7 +41,7 @@ read -p $"Complete Day $day, Part$partstr $parts?"$'\n' reply
 [ -n "$skip" ] && [ $skip == true ] && echo "Stopping..." && exit 1
 
 st=$(head start)
-echo "$day,$parts,$st,$end" >> $timefile
+echo "$day,$parts,$st,$end," >> $timefile
 
 rm start
 
@@ -57,6 +57,11 @@ echo "Congrats on completing the Day $day, part$partstr $parts! :)"
 echo "Times saved in '$(dirname $PWD)/times.csv'"
 
 mv $0 ..
+
+read -p $"Commit solution into Git?"$'\n' reply
+[[ $reply =~ ^[Yy].*$ ]] && commit=true # commit if reply is Yes
+
+[ $commit == true ] || exit 0 # exit if don't wanna commit changes
 
 git add $dir $timefile
 git commit -m "Added solution for Day $day, Part$partstr $parts and updated times.csv"
