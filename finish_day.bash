@@ -40,8 +40,16 @@ read -p $"Complete Day $day, Part$partstr $parts?"$'\n' reply
 [[ $reply =~ ^[Yy].*$ ]] || skip=true # skip if reply is No
 [ -n "$skip" ] && [ $skip == true ] && echo "Stopping..." && exit 1
 
+while [ ! -z "$1" ]; do
+  if [[ "$1" == "-n" ]] || [[ "$1" == "--note" ]]; then
+    note="$2"
+    shift
+  fi
+  shift
+done
+
 st=$(head start)
-echo "$day,$parts,$st,$end," >> $timefile
+echo "$day,$parts,$st,$end,$note" >> $timefile
 
 rm start
 
@@ -61,7 +69,7 @@ mv $0 ..
 read -p $"Commit solution into Git?"$'\n' reply
 [[ $reply =~ ^[Yy].*$ ]] && commit=true # commit if reply is Yes
 
-[ $commit == true ] || exit 0 # exit if don't wanna commit changes
+[ "$commit" == true ] || exit 0 # exit if don't wanna commit changes
 
 git add $dir $timefile
 git commit -m "Added solution for Day $day, Part$partstr $parts and updated times.csv"

@@ -20,7 +20,7 @@ days=`ls -d Day* | wc -l`
 days=${days#0}
 today=${today#0}
 hour=$(date +%H)
-if [ $(($days > $today)) == 1 ] || ([ $today == $days ] && [ $(($hour < 21)) == 1 ])
+if [ $year == $advent_year ] && ([ $(($days > $today)) == 1 ] || ([ $today == $days ] && [ $(($hour < 21)) == 1 ]))
 then
 echo "Too early! Wait until December $(($days)) $advent_year"\
 ", 9pm PST for the next challenge."
