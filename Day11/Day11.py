@@ -7,28 +7,40 @@ FLOOR = "."
 EMPTY = "L"
 OCCUPIED = "#"
 
-def simulate_round(seats):
+def show_grid(grid):
+  for row in grid:
+    print(" ".join(map(str, row)))
+
+def get_potential_changed(seats, positions, changed):
+  rows, cols = changed.shape
+  check = changed.copy()
+  for r, c in positions[changed]:
+    adjacent = np.array([(r-1, c-1), (r-1, c), (r-1, c+1), (r, c-1),
+        (r, c+1), (r+1, c-1), (r+1, c), (r+1, c+1)])
+    valid = np.all(adjacent >= 0, axis=1) & (adjacent[:,0] < rows) & (adjacent[:,1] < cols)
+    for neighbor in adjacent[valid]:
+      nr, nc = neighbor
+      check[nr, nc] = True if seats[nr, nc] != FLOOR else False
+  return check
+
+def simulate_round(seats, positions, check):
   rows, cols = seats.shape
   simulation = seats.copy()
-  changed = False
-  for r, row in enumerate(seats):
-    for c, seat in enumerate(row):
-      adjacent = np.array([(r-1, c-1), (r-1, c), (r-1, c+1), (r, c-1),
-        (r, c+1), (r+1, c-1), (r+1, c), (r+1, c+1)])
-      valid = np.all(adjacent >= 0, axis=1) & np.all(adjacent < cols, axis=1)
-      neighbors = np.array([seats[i, j] for i, j in adjacent[valid]])
-      # print(f"r: {r}, c: {c}, neighbors: {neighbors}")
-      if seat == EMPTY and np.all(neighbors != OCCUPIED):
-        simulation[r, c] = OCCUPIED # occupy seat
-        changed = True
-      elif seat == OCCUPIED and np.sum(neighbors == OCCUPIED) >= 4:
-        simulation[r, c] = EMPTY # empty seat
-        changed = True
+  changed = np.zeros(seats.shape, dtype=bool)
+  for r, c in positions[check]:
+    seat = seats[r, c]
+    adjacent = np.array([(r-1, c-1), (r-1, c), (r-1, c+1), (r, c-1),
+      (r, c+1), (r+1, c-1), (r+1, c), (r+1, c+1)])
+    valid = np.all(adjacent >= 0, axis=1) & (adjacent[:,0] < rows) & (adjacent[:,1] < cols)
+    neighbors = np.array([seats[i, j] for i, j in adjacent[valid]])
+    # print(f"r: {r}, c: {c}, neighbors: {neighbors}")
+    if seat == EMPTY and np.all(neighbors != OCCUPIED):
+      simulation[r, c] = OCCUPIED # occupy seat
+      changed[r, c] = True
+    elif seat == OCCUPIED and np.sum(neighbors == OCCUPIED) >= 4:
+      simulation[r, c] = EMPTY # empty seat
+      changed[r, c] = True
   return changed, simulation
-
-def show_seats(seats):
-  for row in seats:
-    print("".join(row))
 
 def solve(filename):
   seats = []
@@ -37,17 +49,26 @@ def solve(filename):
       line = line.rstrip()
       seats.append([c for c in line])
   seats = np.array(seats)
+  rows, cols = seats.shape
+  positions = np.array([[(r, c) for c in range(cols)] for r in range(rows)])
+  check = (seats != FLOOR)
   round = 0
   print("---Initial Layout---")
   show_seats(seats)
   print("===Simulation Begin===")
   while True:
-    changed, simulation = simulate_round(seats)
-    if changed:
+    changed, simulation = simulate_round(seats, positions, check)
+    if np.any(changed):
       round += 1
       print(f"---Round {round}---")
       seats = simulation
       show_seats(seats)
+      check = get_potential_changed(seats, positions, changed)
+      print(f"Changed: {positions[changed].tolist()}")
+      # show_seats(changed)
+      print(f"To check: {positions[check].tolist()}")
+      # show_seats(check)
+      print(f"{np.sum(check)}")
     else:
       break
   print(f"===Simulation Ended after {round} rounds===")
