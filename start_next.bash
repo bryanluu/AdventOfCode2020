@@ -51,7 +51,7 @@ elif [ $(($day > 25)) == 1 ] && [ -z $1 ]; then
   echo "Day required now..."
   echo "Usage: . start_next.bash day"
   skip=true
-else
+elif [ -n "$1" ]; then
   echo "Invalid day given: $1"
 fi
 
