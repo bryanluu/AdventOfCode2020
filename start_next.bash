@@ -78,7 +78,7 @@ date > start
 echo "Run './finish_day.bash [-a OR --all]' to complete solution."
 
 echo '#!/bin/bash' > run.bash
-echo "$prog $codefile" '$1' >> run.bash
+echo "$prog $codefile" '$@' >> run.bash
 chmod +x run.bash
 
 code $codefile # start editing

@@ -1,2 +1,2 @@
 #!/bin/bash
-ruby Day12.rb $1
+ruby Day12.rb $@
