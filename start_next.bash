@@ -30,40 +30,65 @@ day=$(($days+1))
 
 timefile="times.csv"
 
+programs=("ruby" "julia" "python")
+extensions=("rb" "jl" "py")
+
+i=$(($day%3))
+prog=${programs[i]}
+ext=${extensions[i]}
+
+while [ ! -z "$1" ]; do
+  if [[ "$1" == "-p" ]] || [[ "$1" == "--program" ]]; then
+    input_prog="$2"
+    shift
+    echo "Input program: $input_prog"
+  else
+    input_day=$1
+    echo "Input day: $input_day"
+  fi
+  shift
+done
+
+if [ -n "$input_prog" ]; then
+  for ((i=0;i<${#programs[@]};i++))
+  do
+    if [ "$input_prog" == "${programs[i]}" ]; then
+      prog=$input_prog
+      ext=${extensions[i]}
+    fi
+  done
+fi
+
 skip=false
 # # set custom day if given and it is not yet finished
-if [[ $1 =~ [0-9]+ ]] && [ $((8<=$1 && $1<=25)) == 1 ];
+if [[ $input_day =~ [0-9]+ ]] && [ $((1<=$input_day && $input_day<=25)) == 1 ];
 then
   if [ -f $timefile ]; then
     # Check if part 2 for the given day is not yet finished
-    if [ $(egrep -c -e "^$1,(1\+)?2,.*$" $timefile) == 0 ]; then
-      day=$1
+    if [ $(egrep -c -e "^$input_day,(1\+)?2,.*$" $timefile) == 0 ]; then
+      day=$input_day
     else
-      echo "Day $1 already completed..."
-      read -p $"Continue onto Day $day?"$'\n' reply
-      [[ $reply =~ ^[Yy].*$ ]] || skip=true # skip if reply is No
-      [ $skip == true ] && echo "Stopping..."
+      echo "Day $input_day already completed..."
     fi
   else
-    day=$1
+    day=$input_day
   fi
-elif [ $(($day > 25)) == 1 ] && [ -z $1 ]; then
+elif [ $(($day > 25)) == 1 ] && [ -z $input_day ]; then
   echo "Day required now..."
-  echo "Usage: . start_next.bash day"
+  echo "Usage: . start_next.bash [--program|-p ruby|julia|python] day"
   skip=true
-elif [ -n "$1" ]; then
-  echo "Invalid day given: $1"
+elif [ -n "$input_day" ]; then
+  echo "Invalid day given: $input_day"
 fi
+
+read -p $"Work on Day $day using $prog? (y/n)"$'\n' reply
+[[ $reply =~ ^[Yy].*$ ]] || skip=true # skip if reply is No
+[ $skip == true ] && echo "Stopping..."
 
 if [ $skip == false ]; then
 
 echo "Working on Day $day..."
 dir="Day$day"
-case $(($day%3)) in
-  0) prog="ruby"; ext="rb";;
-  1) prog="julia"; ext="jl";;
-  2) prog="python"; ext="py";;
-esac
 codefile="Day$day.$ext"
 
 mkdir -p $dir

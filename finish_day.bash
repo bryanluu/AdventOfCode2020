@@ -5,7 +5,7 @@ end=$(date)
 folder=${PWD##*/}
 if [ ${folder//[0-9]/} != Day ]
 then
-echo "Cannot run this yet! Start by running '. start_next.bash [day]' first..."
+echo "Cannot run this yet! Start by running '. start_next.bash [--program|-p ruby|julia|python] [day]' first..."
 exit 1
 else
 
