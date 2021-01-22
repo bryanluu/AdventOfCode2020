@@ -1,5 +1,5 @@
 #!/bin/bash
-# This file should be called using `source` rather than bash
+# This file starts the next or given day's challenge for the Advent of Code
 
 advent_year=2020
 finish="finish_day.bash"
@@ -37,11 +37,16 @@ i=$(($day%3))
 prog=${programs[i]}
 ext=${extensions[i]}
 
+force=""
+input_day=""
+input_prog=""
 while [ ! -z "$1" ]; do
   if [[ "$1" == "-p" ]] || [[ "$1" == "--program" ]]; then
     input_prog="$2"
     shift
     echo "Input program: $input_prog"
+  elif [[ "$1" == "-f" ]] || [[ "$1" == "--force" ]]; then
+    force="true"
   else
     input_day=$1
     echo "Input day: $input_day"
@@ -75,19 +80,21 @@ then
   fi
 elif [ $(($day > 25)) == 1 ] && [ -z $input_day ]; then
   echo "Day required now..."
-  echo "Usage: . start_next.bash [--program|-p ruby|julia|python] day"
+  echo "Usage: . start_next.bash [-f|--force] [-p|--program ruby|julia|python] day"
   skip=true
 elif [ -n "$input_day" ]; then
   echo "Invalid day given: $input_day"
 fi
 
-read -p $"Work on Day $day using $prog? (y/n)"$'\n' reply
-[[ $reply =~ ^[Yy].*$ ]] || skip=true # skip if reply is No
-[ $skip == true ] && echo "Stopping..."
+if [ -z "$force" ]; then
+  read -p $"Work on Day $day using $prog? (y/n)"$'\n' reply
+  [[ $reply =~ ^[Yy].*$ ]] || skip=true # skip if reply is No
+  [ $skip == true ] && echo "Stopping..."
+fi
 
 if [ $skip == false ]; then
 
-echo "Working on Day $day..."
+echo "Working on Day $day using $prog..."
 dir="Day$day"
 codefile="Day$day.$ext"
 
@@ -96,17 +103,18 @@ mv $finish $dir
 
 [ ! -f "$dir/$codefile" ] && cp "Templates/${prog}_template.$ext"\
    "$dir/$codefile" # Copy template if the file doesn't exist
-cd $dir
+# cd $dir
 
-date > start
+date > "$dir/start"
 
-echo "Run './finish_day.bash [-a OR --all]' to complete solution."
+echo "Run '$dir/finish_day.bash [-a OR --all]' to complete solution."
 
-echo '#!/bin/bash' > run.bash
-echo "$prog $codefile" '$@' >> run.bash
-chmod +x run.bash
+tester="$dir/run.bash"
+echo '#!/bin/bash' > "$tester"
+echo "$prog $codefile" '$@' >> "$tester"
+chmod +x "$tester"
 
-code $codefile # start editing
+code "$dir/$codefile" # start editing
 
 fi
 
@@ -119,7 +127,7 @@ else
 unfinished=`dirname */$finish`
 day=${unfinished//[!0-9]/}
 echo "Cannot start until Day $day is completed!"
-echo "Run './run.bash [filename]' to test program..."
-echo "Run './finish_day.bash [-a OR --all]' in '$unfinished/' to finish first..."
+echo "Run '$tester [filename]' to test program..."
+echo "Run '$dir/finish_day.bash [-a OR --all]' in '$unfinished/' to finish first..."
 
 fi
